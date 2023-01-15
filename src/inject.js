@@ -39,6 +39,8 @@ function getCurrentStreakText(contributionDate = '', noContributionsToday, forma
 }
 
 function getLastContributionText(contributionDate) {
+    console.log(contributionDate, 'Contribution date');
+    console.log(moment(contributionDate).format('MMM D YYYY'));
     return `Last contributed <time>${moment(contributionDate).fromNow(true)} ago</time>`;
 }
 
@@ -157,6 +159,7 @@ function inject() {
                 firstContributionDate = contributionDate;
 
                 // dont update lastContributionDate once it is set
+                console.log('Last contribution date: ' + lastContributionDate);
                 if (!lastContributionDate) {
                     lastContributionDate = contributionDate;
                 }
