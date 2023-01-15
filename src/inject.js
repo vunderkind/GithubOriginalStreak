@@ -39,6 +39,8 @@ function getCurrentStreakText(contributionDate = '', noContributionsToday, forma
 }
 
 function getLastContributionText(contributionDate) {
+    console.log(contributionDate, 'Contribution date');
+    console.log(moment(contributionDate).format('MMM D YYYY'));
     return `Last contributed <time>${moment(contributionDate).fromNow(true)} ago</time>`;
 }
 
@@ -126,23 +128,30 @@ function inject() {
             const summary = day.innerHTML;
             const parseContributionCount = () => {
                 let contributionCount = summary.substring(0, summary.indexOf(' '));
-                if (contributionCount.toLowerCase() === 'no' || !contributionCount) contributionCount = 0;
+                if (contributionCount.toLowerCase() === 'no' || !contributionCount) {
+                    contributionCount = 0;
+                }
                 contributionCount = Number(contributionCount);
                 return contributionCount;
             }
             const extractedContributionCount = parseContributionCount();
 
 			var count = undefined;
-            if (day.attributes['data-count']) count = parseInt(day.attributes['data-count'].value, 10);
-            if (typeof count === 'undefined') days[index].setAttribute('data-count', extractedContributionCount);
+            if (day.attributes['data-count']) {
+                count = parseInt(day.attributes['data-count'].value, 10);
+            }
+            if (typeof count === 'undefined') {
+                days[index].setAttribute('data-count', extractedContributionCount);
+            }
             var contributionCount = extractedContributionCount;
-            if (!contributionCount) contributionCount = 0;
-
+            if (!contributionCount) {
+                contributionCount = 0;
+            }
 			var contributionDate = undefined;
-			if(day.attributes['data-date']) contributionDate = day.attributes['data-date'].value;
-            var noContributionToday = contributionCount === 0;
-            if (!contributionCount) contributionCount = 0;
-            var contributionDate = day.attributes['data-date'].value;
+			if (day.attributes['data-date']) {
+                contributionDate = day.attributes['data-date'].value;
+            }
+
             var noContributionToday = contributionCount === 0;
 
             if (contributionCount) {
@@ -150,6 +159,7 @@ function inject() {
                 firstContributionDate = contributionDate;
 
                 // dont update lastContributionDate once it is set
+                console.log('Last contribution date: ' + lastContributionDate);
                 if (!lastContributionDate) {
                     lastContributionDate = contributionDate;
                 }
@@ -170,7 +180,6 @@ function inject() {
                 // and longestStreakEndingDate is calculated as longestStreakStartingDate + longestStreak days
                 longestStreakEndingDate = moment(contributionDate).add(longestStreak - 1, 'days');
             }
-
             if (contributionCount && isCurrentStreak) {
                 currentStreak += 1;
             } else if (isCurrentStreak) {
@@ -178,7 +187,8 @@ function inject() {
                 // end currentStreak and
                 // set isCurrentStreak to false
                 // only if we are not processing the very last day
-                if (index !== 0) {
+                // check that the contribution date isn't undefined (this an artefact from the fact that the legend now makes its way into the array of contribution squares.)
+                if (index !== 0 && contributionDate) {
                     if (firstContributionDate) {
                         currentStreakText = getCurrentStreakText(firstContributionDate, noContributionToday);
                     }
